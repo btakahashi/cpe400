@@ -1,0 +1,104 @@
+Link State algorithms
+-global information
+-each router has a complete topology
+
+Distance Vector algorithms
+-knows neighbors and costs to visit
+-iterative process of computation
+
+Static
+-both link state and distance vector
+-links don't change often, but do change
+
+Dynamic
+-routes change more quickly - reactive routing
+-DSR (dynamic source routing)
+
+----------------------------------
+Review Dikjstra's Algorithm
+----------------------------------
+
+Link cost changes
+-Node detects local link cost change
+-Updates routing info, recalc distance vector (DV)
+-if DV changes, notify neighbors
+--if cost goes down, good news, no issues
+
+Oscillation - caused by costs going up
+-costs will bounce back and forth
+--counter intuitive method, may travel "back" through itself
+-will hopefully eventually converge but may not
+--"count to infinity" problem
+-caused by nodes using table only and not knowing link path information
+---current solution "poisoned reverse"
+	-If Z routes through Y to get to X
+	--Z tells Y it's (Z's) distance to X is infinite
+	--therefor Y won't route to X through Z
+	--removes "back" through itself issue
+	-heuristic solution - does not solve every issue but is "okay"
+
+Hierarchical Routing
+-so far-
+	-all routers identical
+	-network "flat"
+	--not true in practice
+-can't store routing table that is large - dikjstra's would take too long
+-routing table exchange would swap links
+-Internet - network of networks
+--each network admin may want to control routing in its own network
+-AS (autonomous systems - number) - routing broken up into regions
+--16 bit field that identifies AS
+--routers in same AS run same routing protocol
+--forwarding table configured by both intra- and inter-AS routing algorithm
+---graphs within graphs
+---AS to AS is inter
+---AS within itself is intra
+	-both use different algorithms
+-Internet routing protocols
+--RIP(routing information protocol) and OSPF(open shortest path first) (intra) - IGP (interior gateway protocols)
+--BGP() (inter) - EGP (exterior gateway protocols)
+	-RIP is DV algorithm
+	--router to destination SUBNET
+	--cost is in terms of "hops" w/ MAX = 15 and each link cost = 1
+	--advertisement - each neighter exchanges DV every 30 seconds
+	---each ad: list of up to 25 destination subnets (meaning 25 neighbors MAX - must include self...so 24 "neighbors")
+	--if no ad after 180s - link declared dead
+	---routes via neighbor invalidated
+	---new ad sent out
+	---link failure quickly propogates
+	---"poison reverse" via 15 hop max - 16 hops forces infinity advertisement and "link break"
+	-OSPF
+	--publicly available
+	--uses link state algorithm
+	---LS packet dissemiation
+	---toplogy map at each node
+	---route computation using Dijkstra's
+	---constrains network to smaller than RIP (10's of nodes)
+	----too many broadcasts - high overhead
+	--one entry per neighbor
+	--advertisement "flooded" to entire AS
+	---carried in OSPF messages directly over IP
+	--creates its own hierarchy
+	---zones divided into smaller zones ("areas" - segments)
+	----requires area gateway router
+	----talk to each other through backbone routers
+	----backbones talk to boundary router
+	----boundary routers talk to other boundary routers
+	----each boundary router controls one AS
+		-each AS is divided into areas mentioned above
+		-area border routers are part of backbone
+		-boundary routers (may be more than 1 in each AS) use BGP to communicate with outside world
+Mobile Ad-hoc Networks
+-reactive in nature
+-no infrastructure
+-host mobility
+-energy consumption
+-faster changes
+-Reactive Protocols (I.E. DSR - Dynamic Source Routing)
+--when node S wants to send to D but does not know route, node S initiates a "route discovery"
+--source node S flood (broadcasts) Rouse Request (RREQ)
+--sends own ID when forwarding RREQ
+--source only knows immediate neighbors
+---each receiver appends info and rebroadcasts
+---may cause collision if two nodes broadcast to same destination but are not direct neighbors
+---once destination is reached, packet is created and is unicast back to sender through apprended broadcasters

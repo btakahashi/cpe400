@@ -1,0 +1,33 @@
+Learning channel access pattern in a multi-channel network
+a: Learning algorithm design
+b: Simulation/experiment design
+c: results
+
+Pick "fastest" channel with lowest cost
+
+single 4-channel hub
+	channels w/ different speeds
+
+Start w/ 4 or less devices - initial testing
+
+MAX 8 devices attempting to connect simultaneously or at different times
+
+Steps:
+generate values for access patterns
+	Access Patterns
+	-Speed available on channel
+	-Avg amount of "traffic"
+		-Traffic
+		--Amount of users in channel
+		--Expandable to: throughput of users and time spent in channel
+	-Time of day
+	
+create "smart" algorithm to decide channel based on access patterns
+	Weight calculations
+	-Table based on ToD
+	-initial weights
+		-high for Speed
+		-low for traffic
+	Recheck on timer
+
+Maybe: Carrier sense multiple acces w/ collision avoidance
