@@ -79,28 +79,34 @@ int main()
 		}
 
 	// print channel access pattern - for comparison purposes only
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < 5; i++)
 	{
 		for(int j = 0; j < history; j++)
 		{
 			switch(i)
 			{
 				case 0:
-					cout << one.freq1[j] << " ";
+					cout << j % 10 << " ";
+					if(j == history - 1)
+						cout << endl;
 					break;
 				case 1:
-					cout << one.freq2[j] << " ";
+					cout << one.freq1[j] << " ";
 					break;
 				case 2:
-					cout << one.freq3[j] << " ";
+					cout << one.freq2[j] << " ";
 					break;
 				case 3:
+					cout << one.freq3[j] << " ";
+					break;
+				case 4:
 					cout << one.freq4[j] << " ";
 					break;
 			}
 		}
 		cout << endl;
 	}
+	cout << endl;
 
 	for(int i = 0; i < 50; i++)
 	{
@@ -139,11 +145,12 @@ int main()
 		// adjust based on learned history
 		if((i % 10) == 0 && i != 0)
 			currentChannel = tryNext(dev1);
+
 	}
 
 	// print channel access probabilities
 	for(int i = 0; i < 4; i++)
-		cout << "Channel: " << i + 1 << " Access Probability: " << dev1.access[i][1] << endl;
+		cout << "Channel: " << i << " Access Probability: " << dev1.access[i][1] << endl;
 	
 
 	return 0; 
