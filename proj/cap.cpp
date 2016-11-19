@@ -49,11 +49,11 @@ int pickCh(device currentDev, int time)
 	return chNum;
 }
 
-bool checkCollision(device deviceArray[])
+bool checkCollision(device deviceArray[], int numDevs)
 {
 	// return true if there is collision, false if not
 	// get highest prob channels of two devices
-	int size = 2;
+	int size = numDevs;
 	int hp[size];
 
 	for(int i = 0; i < size; i++)
@@ -118,7 +118,7 @@ int main()
 		dev[0].currentCh = pickCh(dev[0], i % history);
 		dev[1].currentCh = pickCh(dev[1], i % history);
 
-		if(checkCollision(dev))
+		if(checkCollision(dev, (sizeof(dev) / sizeof(dev[0]))))
 		{
 			//cout << "collision detected @ " << i << endl;
 			dev[0].accessProb[dev[0].currentCh][i % history] -= 0.05;
