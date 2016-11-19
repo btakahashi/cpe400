@@ -114,25 +114,25 @@ int main()
 		switch(currentChannel)
 		{
 			case 0:
-					if(one.freq1[i % 25] == 0)
+					if(one.freq1[i % history] == 0)
 						dev1.access[0][1]++;
 					else
 						currentChannel++;
 					break;
 			case 1:
-					if(one.freq2[i % 25] == 0)
+					if(one.freq2[i % history] == 0)
 						dev1.access[1][1]++;
 					else
 						currentChannel++;
 					break;
 			case 2:
-					if(one.freq3[i % 25] == 0)
+					if(one.freq3[i % history] == 0)
 						dev1.access[2][1]++;
 					else
 						currentChannel++;
 					break;
 			case 3:
-					if(one.freq4[i % 25] == 0)
+					if(one.freq4[i % history] == 0)
 						dev1.access[3][1]++;
 					else
 						currentChannel = 0;
