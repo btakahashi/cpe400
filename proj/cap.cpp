@@ -49,17 +49,38 @@ int pickCh(device currentDev, int time)
 	return chNum;
 }
 
+bool checkCollision(device deviceArray[])
+{
+	// return true if there is collision, false if not
+	// get highest prob channels of two devices
+	int size = 2;
+	int hp[size];
+
+	for(int i = 0; i < size; i++)
+	{
+		hp[i] = deviceArray[i].currentCh;
+	}
+
+	if(hp[0] == hp[1])
+	{
+		return true;
+	}
+
+	return false;
+}
+
 int main()
 {
 	space one;
-	device dev1;
+	device dev[2];
 
 	// initialize device access probability values
 	for(int i = 0; i < 4; i++)
 	{
 		for(int j = 0; j < history; j++)
 		{
-			dev1.accessProb[i][j] = 0.5;
+			dev[0].accessProb[i][j] = 0.5;
+			dev[1].accessProb[i][j] = 0.5;
 		}
 	}
 	
@@ -90,29 +111,48 @@ int main()
 	}
 	cout << endl;
 
-	// train that ho
-	for(int i = 0; i < 500000; i++)
+	// train devices
+	for(int i = 0; i < 100; i++)
 	{
 		// initialize channel
-		dev1.currentCh = pickCh(dev1, i % history);
+		dev[0].currentCh = pickCh(dev[0], i % history);
+		dev[1].currentCh = pickCh(dev[1], i % history);
 
-		// check channel
-		if(one.freq[dev1.currentCh][i % history] == 0)
-			dev1.accessProb[dev1.currentCh][i % history] += 0.05;
+		if(checkCollision(dev))
+		{
+			//cout << "collision detected @ " << i << endl;
+			dev[0].accessProb[dev[0].currentCh][i % history] -= 0.05;
+			dev[1].accessProb[dev[1].currentCh][i % history] -= 0.05;
+		}
 		else
-			dev1.accessProb[dev1.currentCh][i % history] -= 0.05;
+		{
+			// check channel
+				// dev 0
+			if(one.freq[dev[0].currentCh][i % history] == 0)
+				dev[0].accessProb[dev[0].currentCh][i % history] += 0.05;
+			else
+				dev[0].accessProb[dev[0].currentCh][i % history] -= 0.05;
+				// dev 1
+			if(one.freq[dev[1].currentCh][i % history] == 0)
+				dev[1].accessProb[dev[1].currentCh][i % history] += 0.05;
+			else
+				dev[1].accessProb[dev[1].currentCh][i % history] -= 0.05;
+		}
 	}
 
 	// print probability matrix
-	for(int i = 0; i < 4; i++)
+	for(int n = 0; n < 2; n++)
 	{
-		for(int j = 0; j < history; j++)
+		for(int i = 0; i < 4; i++)
 		{
-			cout << dev1.accessProb[i][j] << " ";
+			for(int j = 0; j < history; j++)
+			{
+				cout << dev[n].accessProb[i][j] << " ";
+			}
+			cout << endl;
 		}
-		cout << endl;
+		cout << endl << endl;
 	}
-	cout << endl;
 
 	return 0; 
 }
