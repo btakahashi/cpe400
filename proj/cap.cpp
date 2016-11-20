@@ -1,10 +1,13 @@
 #include <iostream> 
 #include <cmath> 
 #include <cstdlib>
+#include <stdlib.h>  
+#include <time.h>
 
 using namespace std; 
 
 #define history 24
+#define pi  3.141592653589793238463
 
 struct space
 	{
@@ -69,6 +72,52 @@ bool checkCollision(device deviceArray[], int numDevs)
 	return false;
 }
 
+void initPrimaryUsers(space *channels, int pattern)
+	{
+	// Seed random 
+	srand(time(NULL)); 
+
+	// initialize channel access patterns 
+	switch(pattern)
+		{
+		// pattern 0: daily cycles 
+		case 0: 
+		for (int i = 0; i < 4; i++)
+			{
+			for(int j = 0; j < history; j++)
+				{
+				if(i == 0)
+					channels->freq[i][j] = round(3*sin(pi*j/12)/4);
+				else if( i == 1)
+					channels->freq[i][j] = round(3*cos(pi*j/6)/4);
+				else if( i == 2)
+					channels->freq[i][j] = round(3*sin( (pi*j/12) + 8)/4 );
+				else
+					channels->freq[i][j] = round(3*sin( (pi*j/6) + 12)/4 );
+				}
+			}
+		break; 
+
+		// pattern 1: random user access 
+		case 1: 
+		for (int i = 0; i < 4; i++)
+			{
+			for(int j = 0; j < history; j++)
+				{
+				if(i == 0)
+					channels->freq[i][j] = rand()%2;
+				else if( i == 1)
+					channels->freq[i][j] = rand()%2;
+				else if( i == 2)
+					channels->freq[i][j] = rand()%2;
+				else
+					channels->freq[i][j] = rand()%2;
+				}
+			}
+		break; 
+		}	
+	}
+
 int main()
 {
 	space one;
@@ -83,22 +132,9 @@ int main()
 			dev[1].accessProb[i][j] = 0.5;
 		}
 	}
-	
-	// initialize channel access patterns
-	for (int i = 0; i < 4; i++)
-	{
-		for(int j = 0; j < history; j++)
-		{
-			if(i == 0)
-				one.freq[i][j] = round(3* sigmoid(sin(j+5) + 0.75) - 0.05);
-			else if( i == 1)
-				one.freq[i][j] = round(sigmoid(sin(2*j)/3 - 3) - 0.25);
-			else if( i == 2)
-				one.freq[i][j] = round(sigmoid(cos(j)/2) + 0.3);
-			else
-				one.freq[i][j] = round(sigmoid(2*cos((j+4))) - 0.1);
-		}
-	}
+
+	// Initialize access patterns 
+	initPrimaryUsers(&one, 0); 
 
 	// print channel access pattern - for comparison purposes only
 	for(int i = 0; i < 4; i++)
