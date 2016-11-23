@@ -37,10 +37,11 @@ int pickCh(device currentDev, int time)
 		&& currentDev.accessProb[0][time] == currentDev.accessProb[3][time])
 	{
 		// pick random channel
-		return rand() % 4;
+		return rand()%4; 
 	}
-	// assume there is a unique max
-	for(int i = 1; i < 4; i++)
+
+	// Else there is a unique max probability
+	for(int i = 1; i <= 4; i++)
 	{
 		if(currentDev.accessProb[i][time] > highestProb)
 		{
@@ -73,10 +74,7 @@ bool checkCollision(device deviceArray[], int numDevs)
 }
 
 void initPrimaryUsers(space *channels, int pattern)
-	{
-	// Seed random 
-	srand(time(NULL)); 
-
+	{ 
 	// initialize channel access patterns 
 	switch(pattern)
 		{
@@ -122,6 +120,10 @@ int main()
 {
 	space one;
 	device dev[2];
+	int numCollisions = 0; 
+
+	// Seed random number generator 
+	srand(time(NULL)); 
 
 	// initialize device access probability values
 	for(int i = 0; i < 4; i++)
@@ -137,8 +139,10 @@ int main()
 	initPrimaryUsers(&one, 0); 
 
 	// print channel access pattern - for comparison purposes only
+	cout << "Primary User Access - 1 Denotes the channel is being accessed by primary user" << endl;
 	for(int i = 0; i < 4; i++)
 	{
+	cout << "Channel " << i+1 << ": "; 
 		for(int j = 0; j < history; j++)
 		{
 			cout << one.freq[i][j] << " ";
@@ -147,7 +151,21 @@ int main()
 	}
 	cout << endl;
 
+	// Run initial test 
+	for (int j = 1; j < 24; ++j)
+		{
+		// Pick channels
+		dev[0].currentCh = pickCh(dev[0], j % history);
+		dev[1].currentCh = pickCh(dev[1], j % history);
+
+		// Check for collision 
+		if(checkCollision(dev, (sizeof(dev) / sizeof(dev[0]))))
+			numCollisions++; 
+		}
+	cout << "Number of Collisions before training: " << numCollisions << endl; 
+
 	// train devices
+	cout << "Training: "<< endl;
 	for(int i = 0; i < 100; i++)
 	{
 		// initialize channel
@@ -179,8 +197,10 @@ int main()
 	// print probability matrix
 	for(int n = 0; n < 2; n++)
 	{
+		cout << "Device " << n+1 << ": " << endl; 
 		for(int i = 0; i < 4; i++)
 		{
+			cout << "Channel " << i+1 << ": "; 
 			for(int j = 0; j < history; j++)
 			{
 				cout << dev[n].accessProb[i][j] << " ";
@@ -190,6 +210,19 @@ int main()
 		cout << endl << endl;
 	}
 
+	// Run trained test
+	numCollisions = 0;  
+	for (int h = 1; h < 24; ++h)
+		{
+		// Pick channels
+		dev[0].currentCh = pickCh(dev[0], h % history);
+		dev[1].currentCh = pickCh(dev[1], h % history);
+
+		// Check for collision 
+		if(checkCollision(dev, (sizeof(dev) / sizeof(dev[0]))))
+			numCollisions++; 
+		}
+	cout << "Number of Collisions after training: " << numCollisions << endl; 
 	return 0; 
 }
 
