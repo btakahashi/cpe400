@@ -130,6 +130,7 @@ int main()
 	device dev[4];
 	int numCollisions = 0; 
 	bool collision[4];
+	bool collisionDetected = false; 
 	
 	// Seed random number generator 
 	srand(time(NULL)); 
@@ -147,8 +148,8 @@ int main()
 		}
 
 	// Initialize access patterns 
-	initPrimaryUsers(&one, 0); 
-	initPrimaryUsers(&two, 1);
+	initPrimaryUsers(&one, 0); // Cyclical Primary Users
+	initPrimaryUsers(&two, 1); // Random Primary User access 
 
 	// print channel access pattern - for comparison purposes only
 	cout << "Primary User Access - 1 Denotes the channel is being accessed by primary user" << endl
@@ -198,37 +199,17 @@ int main()
 		dev[0].currentCh = pickCh(dev[0], i % history);
 		dev[1].currentCh = pickCh(dev[1], i % history);
 		dev[2].currentCh = pickCh(dev[2], i % history);
-		dev[3].currentCh = pickCh(dev[3], i % history);
+		dev[3].currentCh = pickCh(dev[3], i % history);	
 
-		if(checkCollision(dev, collision, (sizeof(dev) / sizeof(dev[0]))))
+		collisionDetected = checkCollision(dev, collision, (sizeof(dev) / sizeof(dev[0])));
+		for(int d = 0; d < 4; ++d)
 			{
-			for(int k = 0; k < 4; ++k)
-				if(collision[k])
-					dev[k].accessProb[dev[k].currentCh][i % history] -= 0.05;
+			if(collision[d])
+				dev[d].accessProb[dev[d].currentCh][i % history] -= 0.05;
+			else
+				dev[d].accessProb[dev[d].currentCh][i % history] += 0.05;
 			}
-		else
-			{
-			// check channel
-				// dev 0
-			if(one.freq[dev[0].currentCh][i % history] == 0)
-				dev[0].accessProb[dev[0].currentCh][i % history] += 0.05;
-			else
-				dev[0].accessProb[dev[0].currentCh][i % history] -= 0.05;
-				// dev 1
-			if(one.freq[dev[1].currentCh][i % history] == 0)
-				dev[1].accessProb[dev[1].currentCh][i % history] += 0.05;
-			else
-				dev[1].accessProb[dev[1].currentCh][i % history] -= 0.05;
-			if(one.freq[dev[2].currentCh][i % history] == 0)
-				dev[2].accessProb[dev[2].currentCh][i % history] += 0.05;
-			else
-				dev[2].accessProb[dev[2].currentCh][i % history] -= 0.05;
-				// dev 1
-			if(one.freq[dev[3].currentCh][i % history] == 0)
-				dev[3].accessProb[dev[3].currentCh][i % history] += 0.05;
-			else
-				dev[3].accessProb[dev[3].currentCh][i % history] -= 0.05;
-			}
+				
 		}
 
 	// print probability matrix
