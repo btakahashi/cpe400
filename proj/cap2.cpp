@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <stdlib.h>
 #include <time.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -41,12 +42,19 @@ int pickCh(device currentDev, int time)
 		}
 
 	// Else there is a unique max probability
-	for(int i = 0; i < 4; i++)
+	for(int i = 1; i < 4; i++)
 		{
-		if(currentDev.accessProb[i][time] > highestProb)
+			// found non-unique highest probability
+			if(currentDev.accessProb[i][time] == highestProb)
 			{
-			highestProb = currentDev.accessProb[i][time];
-			chNum = i;
+				int pick = rand() % 2;
+				if(pick == 1)
+					chNum = i;
+			}
+			else if(currentDev.accessProb[i][time] > highestProb)
+			{
+				highestProb = currentDev.accessProb[i][time];
+				chNum = i;
 			}
 		}
 
@@ -134,6 +142,8 @@ void initPrimaryUsers(space *channels, int pattern)
 
 int main()
 	{
+		// set output precision
+		cout << setprecision(2) << fixed;
 	space one, two;
 	device dev[3];
 	int numCollisions = 0;
@@ -214,7 +224,7 @@ int main()
 		for(int d = 0; d < 3; ++d)
 			{
 			if(collision[d])
-				dev[d].accessProb[dev[d].currentCh][i % history] -= 0.05;
+				dev[d].accessProb[dev[d].currentCh][i % history] /= 1.05;
 			else
 				dev[d].accessProb[dev[d].currentCh][i % history] += 0.05;
 			}
@@ -325,7 +335,7 @@ int main()
 		for(int d = 0; d < 3; ++d)
 			{
 			if(collision[d])
-				dev[d].accessProb[dev[d].currentCh][i % history] -= 0.05;
+				dev[d].accessProb[dev[d].currentCh][i % history] /= 1.05;
 			else
 				dev[d].accessProb[dev[d].currentCh][i % history] += 0.05;
 			}
