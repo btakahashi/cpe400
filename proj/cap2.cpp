@@ -24,14 +24,18 @@ struct device
 double sigmoid(double input)
 	{
 	// produce val between 0 and 1
-	return abs(input/(1 + abs(input)));
+	return 1/(1 + exp(-input));
 	}
 
-int pickCh(device currentDev, int time)
+int pickCh(device currentDev, int time, bool collision)
 	{
 	double highestProb = currentDev.accessProb[0][time];
 	int chNum = 0;
 
+	if(!collision)
+		return currentDev.currentCh; 
+	else
+	{
 	// all probabilities are same
 	if(currentDev.accessProb[0][time] == currentDev.accessProb[1][time]
 		&& currentDev.accessProb[0][time] == currentDev.accessProb[2][time]
@@ -57,8 +61,9 @@ int pickCh(device currentDev, int time)
 				chNum = i;
 			}
 		}
-
+	}
 	return chNum;
+
 	}
 
 bool checkCollision(device deviceArray[], bool collisions[], bool primaryUsers[], int numDevs)
@@ -147,7 +152,7 @@ int main()
 	space one, two;
 	device dev[3];
 	int numCollisions = 0;
-	bool collision[4];
+	bool collision[4] = {0,0,0,0};
 	bool primUserCT[4];
 
 	// Seed random number generator
@@ -188,10 +193,10 @@ int main()
 	for (int j = 0; j < 24; j++)
 		{
 		// Pick channels
-		dev[0].currentCh = pickCh(dev[0], j % history);
-		dev[1].currentCh = pickCh(dev[1], j % history);
-		dev[2].currentCh = pickCh(dev[2], j % history);
-		//dev[3].currentCh = pickCh(dev[3], j % history);
+		dev[0].currentCh = pickCh(dev[0], j % history, collision[0]);
+		dev[1].currentCh = pickCh(dev[1], j % history, collision[1]);
+		dev[2].currentCh = pickCh(dev[2], j % history, collision[2]);
+		//dev[3].currentCh = pickCh(dev[3], j % history, collision[3]);
 
 		for(int i = 0; i < 4; i++)
 		{
@@ -209,10 +214,10 @@ int main()
 	for(int i = 0; i < 5000; i++)
 		{
 		// initialize channel
-		dev[0].currentCh = pickCh(dev[0], i % history);
-		dev[1].currentCh = pickCh(dev[1], i % history);
-		dev[2].currentCh = pickCh(dev[2], i % history);
-		//dev[3].currentCh = pickCh(dev[3], i % history);
+		dev[0].currentCh = pickCh(dev[0], i % history, collision[0]);
+		dev[1].currentCh = pickCh(dev[1], i % history, collision[1]);
+		dev[2].currentCh = pickCh(dev[2], i % history, collision[2]);
+		//dev[3].currentCh = pickCh(dev[3], i % history, collision[3]);
 
 		for(int j = 0; j < 4; j++)
 		{
@@ -252,10 +257,10 @@ int main()
 	for (int h = 0; h < 24; h++)
 		{
 		// Pick channels
-		dev[0].currentCh = pickCh(dev[0], h % history);
-		dev[1].currentCh = pickCh(dev[1], h % history);
-		dev[2].currentCh = pickCh(dev[2], h % history);
-		//dev[3].currentCh = pickCh(dev[3], h % history);
+		dev[0].currentCh = pickCh(dev[0], h % history, collision[0]);
+		dev[1].currentCh = pickCh(dev[1], h % history, collision[1]);
+		dev[2].currentCh = pickCh(dev[2], h % history, collision[2]);
+		//dev[3].currentCh = pickCh(dev[3], h % history, collision[3]);
 
 		for(int i = 0; i < 4; i++)
 		{
@@ -276,10 +281,10 @@ int main()
 		{
 		for(int j = 0; j < history; j++)
 			{
-			dev[0].accessProb[i][j] = 0.5;
-			dev[1].accessProb[i][j] = 0.5;
-			dev[2].accessProb[i][j] = 0.5;
-			//dev[3].accessProb[i][j] = 0.5;
+			dev[0].currentCh = pickCh(dev[0], j % history, collision[0]);
+			dev[1].currentCh = pickCh(dev[1], j % history, collision[1]);
+			dev[2].currentCh = pickCh(dev[2], j % history, collision[2]);
+			//dev[3].currentCh = pickCh(dev[3], j % history, collision[3]);
 			}
 		}
 
@@ -299,10 +304,10 @@ int main()
 	for (int j = 0; j < 24; j++)
 		{
 		// Pick channels
-		dev[0].currentCh = pickCh(dev[0], j % history);
-		dev[1].currentCh = pickCh(dev[1], j % history);
-		dev[2].currentCh = pickCh(dev[2], j % history);
-		//dev[3].currentCh = pickCh(dev[3], j % history);
+		dev[0].currentCh = pickCh(dev[0], j % history, collision[0]);
+		dev[1].currentCh = pickCh(dev[1], j % history, collision[1]);
+		dev[2].currentCh = pickCh(dev[2], j % history, collision[2]);
+		//dev[3].currentCh = pickCh(dev[3], j % history, collision[3]);
 
 		for(int i = 0; i < 4; i++)
 		{
@@ -317,13 +322,13 @@ int main()
 
 	// train devices
 	cout << "Training: "<< endl;
-	for(int i = 0; i < 5000000; i++)
+	for(int i = 0; i < 5000; i++)
 		{
 		// initialize channel
-		dev[0].currentCh = pickCh(dev[0], i % history);
-		dev[1].currentCh = pickCh(dev[1], i % history);
-		dev[2].currentCh = pickCh(dev[2], i % history);
-		//dev[3].currentCh = pickCh(dev[3], i % history);
+		dev[0].currentCh = pickCh(dev[0], i % history, collision[0]);
+		dev[1].currentCh = pickCh(dev[1], i % history, collision[1]);
+		dev[2].currentCh = pickCh(dev[2], i % history, collision[2]);
+		//dev[3].currentCh = pickCh(dev[3], i % history, collision[3]);
 
 		for(int j = 0; j < 4; j++)
 		{
@@ -363,10 +368,10 @@ int main()
 	for (int h = 0; h < 24; h++)
 		{
 		// Pick channels
-		dev[0].currentCh = pickCh(dev[0], h % history);
-		dev[1].currentCh = pickCh(dev[1], h % history);
-		dev[2].currentCh = pickCh(dev[2], h % history);
-		//dev[3].currentCh = pickCh(dev[3], h % history);
+		dev[0].currentCh = pickCh(dev[0], h % history, collision[0]);
+		dev[1].currentCh = pickCh(dev[1], h % history, collision[1]);
+		dev[2].currentCh = pickCh(dev[2], h % history, collision[2]);
+		//dev[3].currentCh = pickCh(dev[3], h % history, collision[3]);
 
 		for(int i = 0; i < 4; i++)
 		{
